@@ -185,6 +185,8 @@ class JobAdService
      * @param Candidate $candidate
      *
      * @return Collection
+     *
+     * @throws DataRetrievalException
      */
     public function getAppliedJobs(Candidate $candidate): \Illuminate\Support\Collection
     {

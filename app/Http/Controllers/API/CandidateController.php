@@ -2,20 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Services\JobAd\JobAdService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
+use Illuminate\{Http\JsonResponse, Http\Resources\Json\JsonResource, Http\Response, Support\Facades\Log};
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Throwable;
-use App\Http\Requests\Candidate\UpdateCandidateRequest;
-use App\Http\Resources\Mobile\CandidateResource;
-use App\Models\JobAd;
 use App\NewSampleNotification;
-use App\Repositories\API\JobAdRepository;
-use App\Services\Candidates\CandidateService;
-use App\Models\Candidate;
-use App\Http\Controllers\Controller;
+use App\Services\{JobAd\JobAdService, Candidates\CandidateService};
+use App\Models\{JobAd, Candidate};
+use App\Http\{Requests\Candidate\UpdateCandidateRequest, Resources\Mobile\CandidateResource, Controllers\Controller};
 
 /**
  * @package App\Http\Controllers\API
@@ -219,7 +212,7 @@ class CandidateController extends Controller
     {
         return (JsonResource::collection($jobAdService->getAppliedJobs($candidate)))
             ->response()
-            ->setStatusCode(Response::HTTP_OK);
+            ->setStatusCode(ResponseAlias::HTTP_OK);
     }
 
     /**
