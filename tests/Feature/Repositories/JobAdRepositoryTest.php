@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Enums\JobAdStatus;
 use App\Models\JobAd;
 use App\Models\User;
 use App\Models\Candidate;
@@ -47,5 +48,40 @@ class JobAdRepositoryTest extends TestCase
         $this->assertTrue($result->relationLoaded('client.user'));
         $this->assertTrue($result->relationLoaded('position'));
         $this->assertTrue($result->relationLoaded('shifts'));
+    }
+
+    /** @test */
+    public function get_job_ads_for_clients_test(): void
+    {
+        $user = User::factory()->create();
+        $client = Client::factory()->create(['user_id' => $user->id]);
+
+        $activeJobAd = JobAd::factory()->create([
+            'client_id' => $client->id,
+            'job_ad_status_id' => JobAdStatus::APPROVED,
+        ]);
+
+        // Should be excluded (pending review)
+        $pendingJobAd = JobAd::factory()->create([
+            'client_id' => $client->id,
+            'job_ad_status_id' => JobAdStatus::PENDING_REVIEW,
+        ]);
+
+        // Should be excluded (soft deleted)
+        $deletedJobAd = JobAd::factory()->create([
+            'client_id' => $client->id,
+            'job_ad_status_id' => JobAdStatus::APPROVED,
+            'deleted_at' => now(),
+        ]);
+
+        // Act
+        $repository = new JobAdRepository(new JobAd());
+        $result = $repository->getJobAdsForClients($user);
+
+        // Assert
+        $this->assertCount(1, $result);
+        $this->assertEquals($activeJobAd->id, $result[0]->id);
+        $this->assertEquals($client->company_name, $result[0]->company_name);
+        $this->assertEquals($user->first_name, $result[0]->first_name);
     }
 }
