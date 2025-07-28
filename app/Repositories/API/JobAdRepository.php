@@ -2,6 +2,7 @@
 
 namespace App\Repositories\API;
 
+use App\Repositories\AbstractCrudRepository;
 use DB;
 use Carbon\Carbon;
 use App\Enums\Roles;
@@ -16,8 +17,17 @@ use App\Models\User;
  *
  * @package App\Repositories\API
  */
-class JobAdRepository
+class JobAdRepository extends AbstractCrudRepository
 {
+    /**
+     * JobAd constructor.
+     *
+     * @param JobAd $model
+     */
+    public function __construct(
+        private readonly JobAd $model
+    ) {}
+
     /**
      * @param JobAd $jobAd
      *

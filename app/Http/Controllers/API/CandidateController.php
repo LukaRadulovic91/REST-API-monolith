@@ -5,11 +5,11 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
-use App\Enums\Roles;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 use App\Http\Requests\Candidate\UpdateCandidateRequest;
 use App\Http\Resources\Mobile\CandidateResource;
 use App\Models\JobAd;
-use App\Models\User;
 use App\NewSampleNotification;
 use App\Repositories\API\JobAdRepository;
 use App\Services\Candidates\CandidateService;
@@ -152,32 +152,50 @@ class CandidateController extends Controller
      */
     public function applyForJob(Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): JsonResponse
     {
-        if ($candidateService->checkIfCandidateAlreadyApplied($jobAd)) {
-            return response()->json(['success' => false, 'message' => 'You already applied for this position.']);
+        try {
+            if ($candidateService->checkIfCandidateAlreadyApplied($jobAd)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You already applied for this position.'
+                ], Response::HTTP_CONFLICT);
+            }
+
+            $candidateService->applyForJob($jobAd);
+
+            $user = $candidateService->getUser($jobAd);
+
+            if ($user) {
+                $user->notify(
+                    new NewSampleNotification(
+                        'A candidate has applied for the job you posted.',
+                        sprintf(
+                            '%s %s applied for the %s position!',
+                            $candidate->user->first_name,
+                            $candidate->user->last_name,
+                            $jobAd->position->title
+                        )
+                    )
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Successful job application.'
+            ], Response::HTTP_OK);
+
+        } catch (Throwable $e) {
+            Log::error('Job application failed', [
+                'candidate_id' => $candidate->id,
+                'job_ad_id' => $jobAd->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred during the job application process.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        $candidateService->applyForJob($jobAd);
-
-        $user = User::rightJoin('expo_tokens as et', 'et.owner_id', '=','users.id')
-            ->join('clients as c', 'c.user_id', '=', 'users.id')
-            ->join('job_ads as ja', 'ja.client_id', '=', 'c.id')
-            ->where(function($query) use ($jobAd) {
-                $query->where('role_id', '=', Roles::CLIENT)
-                      ->where('ja.id', $jobAd->id);
-            })
-            ->whereNull('users.deleted_at')
-            ->select('users.id')
-            ->first();
-
-        $user->notify(
-            new NewSampleNotification(
-                'A candidate has applied for the job you posted.',
-                $candidate->user->first_name.' '.
-                $candidate->user->last_name .' applied for '.
-                $jobAd->position->title . ' position!'
-            )
-        );
-
-        return response()->json(['success' => true, 'message' => 'Successful job application.']);
     }
 
     /**
@@ -226,7 +244,7 @@ class CandidateController extends Controller
      *     @OA\Response(response=200, description="Approval status returned")
      * )
      */
-    public function checkIfIsApproved( Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): void
+    public function checkIfIsApproved( Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): JsonResponse
     {
         if ($candidateService->checkIfCandidateIsApproved($jobAd, $candidate))
         {

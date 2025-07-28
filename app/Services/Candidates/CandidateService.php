@@ -2,6 +2,7 @@
 
 namespace App\Services\Candidates;
 
+use App\Repositories\API\CandidateRepository;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +22,28 @@ use App\Models\User;
  */
 class CandidateService
 {
+    /** @var CandidateRepository */
+    private CandidateRepository $candidateRepo;
+
+    /**
+     * @param CandidateRepository $candidateRepo
+     */
+    public function __construct(
+        CandidateRepository $candidateRepo
+    )
+    {
+        $this->candidateRepo = $candidateRepo;
+    }
+
+    /**
+     * @param JobAd $jobAd
+     *
+     * @return User
+     */
+    public function getUser(JobAd $jobAd): User
+    {
+        return $this->candidateRepo->getUser($jobAd);
+    }
 
     /**
      * @param Request $request

@@ -6,6 +6,13 @@ use Illuminate\Http\JsonResponse;
 
 trait ApiResponseTrait
 {
+    /**
+     * @param mixed|null $data
+     * @param string $message
+     * @param int $code
+     *
+     * @return JsonResponse
+     */
     protected function successResponse(mixed $data = null, string $message = 'Success', int $code = 200): JsonResponse
     {
         return response()->json([
@@ -15,6 +22,13 @@ trait ApiResponseTrait
         ], $code);
     }
 
+    /**
+     * @param string $message
+     * @param int $code
+     * @param mixed|null $errors
+     *
+     * @return JsonResponse
+     */
     protected function errorResponse(string $message = 'Error', int $code = 500, mixed $errors = null): JsonResponse
     {
         return response()->json([
@@ -36,7 +50,7 @@ trait ApiResponseTrait
             'message' => $message,
         ], JsonResponse::HTTP_UNAUTHORIZED);
     }
-    
+
     /**
      * @param $error
      * @param array $errorMessages
