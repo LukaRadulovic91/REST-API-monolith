@@ -23,4 +23,38 @@ trait ApiResponseTrait
             'errors'  => $errors,
         ], $code);
     }
+
+    /**
+     * @param string $message
+     *
+     * @return JsonResponse
+     */
+    protected function unauthorizedStatusResponse(string $message): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+        ], JsonResponse::HTTP_UNAUTHORIZED);
+    }
+    
+    /**
+     * @param $error
+     * @param array $errorMessages
+     * @param int $code
+     *
+     * @return JsonResponse
+     */
+    protected function sendError($error, $errorMessages = [], $code = 404): JsonResponse
+    {
+        $response = [
+            'success' => false,
+            'message' => $error,
+        ];
+
+        if (!empty($errorMessages)) {
+            $response['data'] = $errorMessages;
+        }
+
+        return response()->json($response, $code);
+    }
 }
