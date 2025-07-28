@@ -17,9 +17,8 @@ use App\Models\Candidate;
 use App\Http\Controllers\Controller;
 
 /**
- * Class CandidateController
- *
  * @package App\Http\Controllers\API
+ * @OA\Tag(name="Candidates", description="Candidate-related endpoints")
  */
 class CandidateController extends Controller
 {
@@ -63,7 +62,6 @@ class CandidateController extends Controller
      *     @OA\Response(response=404, description="Candidate not found")
      * )
      */
-
     public function show(Candidate $candidate, CandidateService $candidateService): JsonResponse
     {
         return (new CandidateResource($candidateService->getCandidate($candidate)))
@@ -87,7 +85,6 @@ class CandidateController extends Controller
      *     @OA\Response(response=200, description="Candidate data for edit retrieved")
      * )
      */
-
     public function edit(Candidate $candidate, CandidateService $candidateService): JsonResponse
     {
         return (new CandidateResource($candidateService->getCandidate($candidate)))
@@ -116,7 +113,6 @@ class CandidateController extends Controller
      *     @OA\Response(response=422, description="Validation error")
      * )
      */
-
     public function update(
         UpdateCandidateRequest $request,
         Candidate $candidate,
@@ -154,7 +150,6 @@ class CandidateController extends Controller
      *     @OA\Response(response=500, description="Server error")
      * )
      */
-
     public function applyForJob(Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): JsonResponse
     {
         if ($candidateService->checkIfCandidateAlreadyApplied($jobAd)) {
@@ -201,7 +196,6 @@ class CandidateController extends Controller
      *     @OA\Response(response=200, description="Jobs retrieved successfully")
      * )
      */
-
     public function myJobs(Candidate $candidate, JobAdRepository $jobAdRepository): JsonResponse
     {
         return (JsonResource::collection($jobAdRepository->getJobAdsForCandidate($candidate)))
@@ -232,7 +226,6 @@ class CandidateController extends Controller
      *     @OA\Response(response=200, description="Approval status returned")
      * )
      */
-
     public function checkIfIsApproved( Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): void
     {
         if ($candidateService->checkIfCandidateIsApproved($jobAd, $candidate))
@@ -266,7 +259,6 @@ class CandidateController extends Controller
      *     @OA\Response(response=200, description="Application status returned")
      * )
      */
-
     public function checkIfIsApplied( Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): mixed
     {
         if ($candidateService->checkIfCandidateIsApplied($jobAd, $candidate))
