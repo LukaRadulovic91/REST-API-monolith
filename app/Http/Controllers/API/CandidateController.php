@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Services\JobAd\JobAdService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
@@ -214,9 +215,9 @@ class CandidateController extends Controller
      *     @OA\Response(response=200, description="Jobs retrieved successfully")
      * )
      */
-    public function myJobs(Candidate $candidate, JobAdRepository $jobAdRepository): JsonResponse
+    public function myJobs(Candidate $candidate, JobAdService $jobAdService): JsonResponse
     {
-        return (JsonResource::collection($jobAdRepository->getJobAdsForCandidate($candidate)))
+        return (JsonResource::collection($jobAdService->getAppliedJobs($candidate)))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
     }

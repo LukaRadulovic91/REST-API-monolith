@@ -3,16 +3,12 @@
 namespace App\Services\JobAd;
 
 use DB;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use App\Enums\Roles;
-use App\Models\User;
+use Illuminate\{Support\Facades\Log, Http\Request, Support\Collection};
+use App\Exceptions\Domain\DataRetrievalException;
 use App\NewSampleNotification;
-use App\Models\CandidateJobAd;
-use App\Models\Shift;
-use App\Models\JobAd;
-use App\Enums\JobAdStatus;
-use App\Enums\JobAdTypes;
+use App\Enums\{Roles, JobAdStatus, JobAdTypes};
+use App\Models\{Candidate, User, CandidateJobAd, Shift, JobAd};
+use App\Repositories\API\JobAdRepository;
 
 /**
  * Class JobAdService
@@ -21,6 +17,12 @@ use App\Enums\JobAdTypes;
  */
 class JobAdService
 {
+    private JobAdRepository $jobAdRepository;
+
+    public function __construct(JobAdRepository $jobAdRepository)
+    {
+        $this->jobAdRepository = $jobAdRepository;
+    }
     /**
      * @param Request $request
      *
@@ -177,6 +179,25 @@ class JobAdService
         $jobAd->update([
             'job_ad_status_id' => JobAdStatus::COMPLETED
         ]);
+    }
+
+    /**
+     * @param Candidate $candidate
+     *
+     * @return Collection
+     */
+    public function getAppliedJobs(Candidate $candidate): \Illuminate\Support\Collection
+    {
+        try {
+            return $this->jobAdRepository->getJobAdsForCandidate($candidate);
+        } catch (\Throwable $e) {
+            Log::error('Failed to retrieve applied jobs for candidate', [
+                'candidate_id' => $candidate->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new DataRetrievalException('Unable to retrieve applied jobs at this time.', 0, $e);
+        }
     }
 
     /**
