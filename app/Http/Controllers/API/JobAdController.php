@@ -51,9 +51,17 @@ class JobAdController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/api/job-ads",
+     *     summary="Get list of job ads",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/JobAdResource"))
+     *     )
+     * )
      */
     public function index(): JsonResponse
     {
@@ -67,9 +75,21 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param HomeRequest $request
-     *
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/api/job-ads/home",
+     *     summary="Get job ads for home screen with filters",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/HomeRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/JobAdResource"))
+     *     )
+     * )
      */
     public function home(HomeRequest $request)
     {
@@ -79,9 +99,21 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param CreateJobAdRequest $request
-     *
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/api/job-ads",
+     *     summary="Create a new job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/CreateJobAdRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Job Ad created",
+     *         @OA\JsonContent(ref="#/components/schemas/JobAdResource")
+     *     )
+     * )
      */
     public function store(CreateJobAdRequest $request): JsonResponse
     {
@@ -115,10 +147,24 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param JobAd $jobAd
-     * @param JobAdRepository $jobAdRepository
-     *
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/api/job-ads/{id}",
+     *     summary="Get job ad by ID",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/JobAdResource")
+     *     )
+     * )
      */
     public function show(JobAd $jobAd, JobAdRepository $jobAdRepository): JsonResponse
     {
@@ -130,10 +176,28 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param UpdateJobAdRequest $request
-     * @param JobAd $jobAd
-     *
-     * @return JsonResponse
+     * @OA\Put(
+     *     path="/api/job-ads/{id}",
+     *     summary="Update a job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/UpdateJobAdRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=202,
+     *         description="Job Ad updated",
+     *         @OA\JsonContent(ref="#/components/schemas/JobAdResource")
+     *     )
+     * )
      */
     public function update(UpdateJobAdRequest $request, JobAd $jobAd): JsonResponse
     {
@@ -145,10 +209,27 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param JobAd $jobAd
-     * @param JobAdService $jobAdService
-     *
-     * @return JsonResponse
+     * @OA\Delete(
+     *     path="/api/job-ads/{id}",
+     *     summary="Delete a job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Job ad deleted",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function destroy(JobAd $jobAd, JobAdService $jobAdService): JsonResponse
     {
@@ -158,13 +239,24 @@ class JobAdController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @param JobAd $jobAd
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Get(
+     *     path="/api/job-ads/{id}/history",
+     *     summary="Get job ad history",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/JobAdResource"))
+     *     )
+     * )
      */
     public function getHistory(JobAd $jobAd): JsonResponse
     {
@@ -176,13 +268,24 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param JobAd $jobAd
-     * @param JobAdService $jobAdService
-     * @param JobAdRepository $jobAdRepository
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/job-ads/{id}/cancel-by-client",
+     *     summary="Cancel job ad by client",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Job Ad cancelled",
+     *         @OA\JsonContent(ref="#/components/schemas/JobAdResource")
+     *     )
+     * )
      */
     public function cancelJobAdByClient(
         JobAd $jobAd,
@@ -227,14 +330,28 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param CancelJobAdRequest $cancelJobAdRequest
-     * @param JobAd $jobAd
-     * @param JobAdService $jobAdService
-     * @param JobAdRepository $jobAdRepository
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/job-ads/{id}/cancel-by-candidate",
+     *     summary="Cancel job ad by candidate",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/CancelJobAdRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Job Ad cancelled by candidate",
+     *         @OA\JsonContent(ref="#/components/schemas/JobAdResource")
+     *     )
+     * )
      */
     public function cancelJobAdByCandidate(
         CancelJobAdRequest $cancelJobAdRequest,
@@ -272,13 +389,28 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param FeedbackRequest $request
-     * @param JobAd $jobAd
-     * @param ClientService $clientService
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/job-ads/{id}/client-feedback",
+     *     summary="Submit client feedback for job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/FeedbackRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Client feedback submitted",
+     *         @OA\JsonContent(ref="#/components/schemas/JobAdResource")
+     *     )
+     * )
      */
     public function clientFeedback(
         FeedbackRequest $request,
@@ -295,13 +427,28 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param FeedbackRequest $request
-     * @param JobAd $jobAd
-     * @param CandidateService $candidateService
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/job-ads/{id}/candidate-feedback",
+     *     summary="Submit candidate feedback for job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/FeedbackRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Candidate feedback submitted",
+     *         @OA\JsonContent(ref="#/components/schemas/JobAdResource")
+     *     )
+     * )
      */
     public function candidateFeedback(
         FeedbackRequest $request,
@@ -318,12 +465,30 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param HomeRequest $request
-     * @param JobAd $jobAd
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/job-ads/{id}/dates",
+     *     summary="Get dates related to a job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/HomeRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dates data",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     )
+     * )
      */
     public function getDates(HomeRequest $request, JobAd $jobAd): JsonResponse
     {
@@ -336,12 +501,27 @@ class JobAdController extends Controller
     }
 
     /**
-     * @param JobAd $jobAd
-     * @param CandidateService $candidateService
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Get(
+     *     path="/api/job-ads/{id}/candidates-applied",
+     *     summary="Get candidates applied for job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of candidates",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="other", type="array", @OA\Items()),
+     *             @OA\Property(property="recommended", type="array", @OA\Items())
+     *         )
+     *     )
+     * )
      */
     public function getCandidatesApplied(JobAd $jobAd, CandidateService $candidateService): JsonResponse
     {
@@ -355,13 +535,31 @@ class JobAdController extends Controller
 
 
     /**
-     * @param ApproveCandidateRequest $approveCandidateRequest
-     * @param JobAd $jobAd
-     * @param ClientService $clientService
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/job-ads/{id}/approve-candidate",
+     *     summary="Approve a candidate for a job ad",
+     *     tags={"JobAds"},
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Job Ad ID",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/ApproveCandidateRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Candidate approved",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean"),
+     *             @OA\Property(property="message", type="string")
+     *         )
+     *     )
+     * )
      */
     public function approveCandidate(
         ApproveCandidateRequest $approveCandidateRequest,

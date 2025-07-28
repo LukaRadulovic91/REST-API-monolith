@@ -29,12 +29,28 @@ class UserController extends Controller
     }
 
     /**
-     * @param User $user
-     *
-     * @param UserService $userService
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Get(
+     *     path="/api/users/{user}/check-approved",
+     *     summary="Provera da li je korisnik odobren",
+     *     tags={"Users"},
+     *     @OA\Parameter(
+     *         name="user",
+     *         in="path",
+     *         description="ID korisnika",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Status korisnika",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="approved", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(response=403, description="Nemate dozvolu"),
+     *     @OA\Response(response=404, description="Korisnik nije pronađen")
+     * )
      */
     public function checkIsUserApproved(User $user, UserService  $userService): JsonResponse
     {
@@ -44,13 +60,28 @@ class UserController extends Controller
     }
 
     /**
-     * @param NotificationsRequest $request
-     * @param User $user
-     * @param UserService $userService
-     *
-     * @return mixed
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/users/{user}/notifications",
+     *     summary="Uključi/isključi notifikacije za korisnika",
+     *     tags={"Users"},
+     *     @OA\Parameter(
+     *         name="user",
+     *         in="path",
+     *         description="ID korisnika",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"enable_notifications"},
+     *             @OA\Property(property="enable_notifications", type="boolean", example=true)
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Status notifikacija promenjen"),
+     *     @OA\Response(response=403, description="Nemate dozvolu"),
+     *     @OA\Response(response=500, description="Greška na serveru")
+     * )
      */
     public function toggleNotificationsStatus(
         NotificationsRequest $request,
@@ -74,13 +105,36 @@ class UserController extends Controller
     }
 
     /**
-     * @param ChangeImageRequest $request
-     * @param User $user
-     * @param UserService $userService
-     *
-     * @return JsonResponse
-     *
-     * @throws AuthorizationException
+     * @OA\Post(
+     *     path="/api/users/{user}/change-image",
+     *     summary="Promeni sliku korisnika",
+     *     tags={"Users"},
+     *     @OA\Parameter(
+     *         name="user",
+     *         in="path",
+     *         description="ID korisnika",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"image"},
+     *                 @OA\Property(
+     *                     description="Nova slika korisnika",
+     *                     property="image",
+     *                     type="string",
+     *                     format="binary"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Slika uspešno promenjena"),
+     *     @OA\Response(response=403, description="Nemate dozvolu"),
+     *     @OA\Response(response=500, description="Greška na serveru")
+     * )
      */
     public function changeImage(
         ChangeImageRequest $request,

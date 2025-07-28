@@ -47,13 +47,23 @@ class CandidateController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param Candidate $candidate
-     * @param CandidateService $candidateService
-     *
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/api/candidates/{candidate}",
+     *     summary="Get a specific candidate",
+     *     tags={"Candidates"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="candidate",
+     *         in="path",
+     *         required=true,
+     *         description="Candidate ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Candidate retrieved successfully"),
+     *     @OA\Response(response=404, description="Candidate not found")
+     * )
      */
+
     public function show(Candidate $candidate, CandidateService $candidateService): JsonResponse
     {
         return (new CandidateResource($candidateService->getCandidate($candidate)))
@@ -62,13 +72,22 @@ class CandidateController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param Candidate $candidate
-     * @param CandidateService $candidateService
-     *
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/api/candidates/{candidate}/edit",
+     *     summary="Fetch candidate data for editing",
+     *     tags={"Candidates"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="candidate",
+     *         in="path",
+     *         required=true,
+     *         description="Candidate ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Candidate data for edit retrieved")
+     * )
      */
+
     public function edit(Candidate $candidate, CandidateService $candidateService): JsonResponse
     {
         return (new CandidateResource($candidateService->getCandidate($candidate)))
@@ -77,12 +96,27 @@ class CandidateController extends Controller
     }
 
     /**
-     * @param UpdateCandidateRequest $request
-     * @param Candidate $candidate
-     * @param CandidateService $candidateService
-     *
-     * @return JsonResponse
+     * @OA\Put(
+     *     path="/api/candidates/{candidate}",
+     *     summary="Update candidate profile",
+     *     tags={"Candidates"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="candidate",
+     *         in="path",
+     *         required=true,
+     *         description="Candidate ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/UpdateCandidateRequest")
+     *     ),
+     *     @OA\Response(response=200, description="Candidate updated successfully"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
      */
+
     public function update(
         UpdateCandidateRequest $request,
         Candidate $candidate,
@@ -97,12 +131,30 @@ class CandidateController extends Controller
     }
 
     /**
-     * @param Candidate $candidate
-     * @param JobAd $jobAd
-     * @param CandidateService $candidateService
-     *
-     * @return JsonResponse
+     * @OA\Post(
+     *     path="/api/candidates/{candidate}/jobs/{jobAd}/apply",
+     *     summary="Candidate applies for a job",
+     *     tags={"Candidates"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="candidate",
+     *         in="path",
+     *         required=true,
+     *         description="Candidate ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="jobAd",
+     *         in="path",
+     *         required=true,
+     *         description="Job Ad ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Applied successfully or already applied"),
+     *     @OA\Response(response=500, description="Server error")
+     * )
      */
+
     public function applyForJob(Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): JsonResponse
     {
         if ($candidateService->checkIfCandidateAlreadyApplied($jobAd)) {
@@ -134,11 +186,22 @@ class CandidateController extends Controller
     }
 
     /**
-     * @param Candidate $candidate
-     * @param JobAdRepository $jobAdRepository
-     *
-     * @return JsonResponse
+     * @OA\Get(
+     *     path="/api/candidates/{candidate}/my-jobs",
+     *     summary="List of jobs candidate applied to",
+     *     tags={"Candidates"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="candidate",
+     *         in="path",
+     *         required=true,
+     *         description="Candidate ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Jobs retrieved successfully")
+     * )
      */
+
     public function myJobs(Candidate $candidate, JobAdRepository $jobAdRepository): JsonResponse
     {
         return (JsonResource::collection($jobAdRepository->getJobAdsForCandidate($candidate)))
@@ -147,12 +210,29 @@ class CandidateController extends Controller
     }
 
     /**
-     * @param Candidate $candidate
-     * @param JobAd $jobAd
-     * @param CandidateService $candidateService
-     *
-     * @return void
+     * @OA\Get(
+     *     path="/api/candidates/{candidate}/jobs/{jobAd}/is-approved",
+     *     summary="Check if candidate is approved for a job",
+     *     tags={"Candidates"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="candidate",
+     *         in="path",
+     *         required=true,
+     *         description="Candidate ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="jobAd",
+     *         in="path",
+     *         required=true,
+     *         description="Job Ad ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Approval status returned")
+     * )
      */
+
     public function checkIfIsApproved( Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): void
     {
         if ($candidateService->checkIfCandidateIsApproved($jobAd, $candidate))
@@ -164,12 +244,29 @@ class CandidateController extends Controller
     }
 
     /**
-     * @param Candidate $candidate
-     * @param JobAd $jobAd
-     * @param CandidateService $candidateService
-     *
-     * @return mixed
+     * @OA\Get(
+     *     path="/api/candidates/{candidate}/jobs/{jobAd}/is-applied",
+     *     summary="Check if candidate applied for a job",
+     *     tags={"Candidates"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="candidate",
+     *         in="path",
+     *         required=true,
+     *         description="Candidate ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="jobAd",
+     *         in="path",
+     *         required=true,
+     *         description="Job Ad ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Application status returned")
+     * )
      */
+
     public function checkIfIsApplied( Candidate $candidate, JobAd $jobAd, CandidateService $candidateService): mixed
     {
         if ($candidateService->checkIfCandidateIsApplied($jobAd, $candidate))
