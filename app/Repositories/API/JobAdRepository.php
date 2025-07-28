@@ -48,7 +48,6 @@ class JobAdRepository extends AbstractCrudRepository
         return $jobs->where('job_ads.id', $jobAd->id)->first();
     }
 
-
     /**
      * @param User $user
      *
