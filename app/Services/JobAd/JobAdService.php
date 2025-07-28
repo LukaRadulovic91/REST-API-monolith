@@ -23,6 +23,7 @@ class JobAdService
     {
         $this->jobAdRepository = $jobAdRepository;
     }
+
     /**
      * @param Request $request
      *
